@@ -21,6 +21,12 @@ class ServiceModel {
   });
 }
 
+class JumbotronModel {
+  final String imagePath;
+
+  JumbotronModel({required this.imagePath});
+}
+
 class _DashboardState extends State<Dashboard> {
   final List<String> makananList = [
     'Nasi Goreng',
@@ -28,6 +34,13 @@ class _DashboardState extends State<Dashboard> {
     'Sate Padang',
     'Rendang',
     'Ayam Geprek',
+  ];
+
+  final List<JumbotronModel> jumbotronItems = [
+    JumbotronModel(imagePath: 'images/jumbotron.png'),
+    JumbotronModel(imagePath: 'images/jumbotron2.png'),
+    JumbotronModel(imagePath: 'images/jumbotron3.jpg'),
+    JumbotronModel(imagePath: 'images/jumbotron4.jpg'),
   ];
 
   final List<ServiceModel> services = [
@@ -69,22 +82,23 @@ class _DashboardState extends State<Dashboard> {
   ];
 
   int _currentIndex = 0;
+  int _currentJumbotronIndex = 0;
   Timer? _timer;
+  Timer? _jumbotronTimer;
+  late PageController _jumbotronController;
 
-  // Controller untuk scroll
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
 
   @override
   void initState() {
     super.initState();
+    _jumbotronController = PageController();
     _startHintChanger();
-
-    // Tambahkan listener untuk scroll
+    _startJumbotronChanger();
     _scrollController.addListener(_scrollListener);
   }
 
-  // Listener untuk mendeteksi scroll
   void _scrollListener() {
     if (_scrollController.offset > 10 && !_isScrolled) {
       setState(() {
@@ -105,9 +119,29 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
+  void _startJumbotronChanger() {
+    _jumbotronTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_currentJumbotronIndex < jumbotronItems.length - 1) {
+        _currentJumbotronIndex++;
+      } else {
+        _currentJumbotronIndex = 0;
+      }
+
+      if (_jumbotronController.hasClients) {
+        _jumbotronController.animateToPage(
+          _currentJumbotronIndex,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    _jumbotronTimer?.cancel();
+    _jumbotronController.dispose();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
@@ -115,44 +149,78 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'GoPay UI',
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            // Body content
-            CustomScrollView(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {},
+            child: CustomScrollView(
               controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
-                  padding: EdgeInsets.only(top: 85),
+                  padding: const EdgeInsets.only(top: 85),
                   sliver: SliverToBoxAdapter(
                     child: Column(
                       children: [
                         Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: 220,
-                              child: Image.asset(
-                                'images/jumbotron.png',
-                                fit: BoxFit.cover,
+                            GestureDetector(
+                              onHorizontalDragEnd: (details) {
+                                if (details.primaryVelocity! > 0) {
+                                  if (_currentJumbotronIndex > 0) {
+                                    _jumbotronController.previousPage(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                } else if (details.primaryVelocity! < 0) {
+                                  if (_currentJumbotronIndex <
+                                      jumbotronItems.length - 1) {
+                                    _jumbotronController.nextPage(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                }
+                              },
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: 220,
+                                child: PageView.builder(
+                                  controller: _jumbotronController,
+                                  onPageChanged: (index) {
+                                    setState(() {
+                                      _currentJumbotronIndex = index;
+                                    });
+                                  },
+                                  itemCount: jumbotronItems.length,
+                                  itemBuilder: (context, index) {
+                                    return Stack(
+                                      children: [
+                                        // Image
+                                        Image.asset(
+                                          jumbotronItems[index].imagePath,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: 220,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-
-                            Positioned(
-                              left: 20,
-                              right: 20,
-                              bottom: -60,
-                              child: _buildGopayContainer(),
                             ),
                           ],
                         ),
 
-                        // Content area
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
@@ -160,132 +228,153 @@ class _DashboardState extends State<Dashboard> {
                           ),
                           child: Column(
                             children: [
-                              SizedBox(height: 60),
+                              _buildGopayContainer(),
+                              const SizedBox(height: 30),
 
                               Wrap(
                                 spacing: 4,
                                 runSpacing: 16,
                                 children: [
                                   ...services.map((service) {
-                                    return SizedBox(
-                                      width: 80,
-                                      child: ServiceItem(service: service),
+                                    return InkWell(
+                                      onTap: () {
+                                        print("Mengklik ${service.name}");
+                                        // Add your service tap handling here
+                                      },
+                                      child: SizedBox(
+                                        width: 80,
+                                        child: ServiceItem(service: service),
+                                      ),
                                     );
                                   }).toList(),
-                                  SizedBox(
-                                    width: 80,
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          width: 60,
-                                          height: 60,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            borderRadius: BorderRadius.circular(
-                                              15,
+                                  InkWell(
+                                    onTap: () {},
+                                    child: SizedBox(
+                                      width: 80,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: 60,
+                                            height: 60,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            child: const Icon(
+                                              Icons.more_horiz,
+                                              color: Colors.grey,
+                                              size: 30,
                                             ),
                                           ),
-                                          child: const Icon(
-                                            Icons.more_horiz,
-                                            color: Colors.grey,
-                                            size: 30,
+                                          const SizedBox(height: 8),
+                                          const Text(
+                                            'Lainnya',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Text(
-                                          'Lainnya',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
 
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
 
                               // GoPay Plus
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 15,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF00880C),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      height: 20,
-                                      width: 20,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: Color(0xFF00880C),
-                                        size: 20,
-                                        weight: 1000,
-                                      ),
-                                    ),
-                                    SizedBox(width: 5),
-                                    Expanded(
-                                      child: Text(
-                                        'Diskon s.d. 10rb/transaksi. Yuk, langganan',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
+                              InkWell(
+                                onTap: () {},
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 15,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF00880C),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.add,
+                                          color: Color(0xFF00880C),
+                                          size: 20,
+                                          weight: 1000,
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Container(
-                                      height: 20,
-                                      width: 20,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        shape: BoxShape.circle,
+                                      const SizedBox(width: 5),
+                                      const Expanded(
+                                        child: Text(
+                                          'Diskon s.d. 10rb/transaksi. Yuk, langganan',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
                                       ),
-                                      child: FaIcon(
-                                        FontAwesomeIcons.arrowRight,
-                                        size: 14,
-                                        color: Color(0xFF00880C),
+                                      const SizedBox(width: 10),
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const FaIcon(
+                                          FontAwesomeIcons.arrowRight,
+                                          size: 14,
+                                          color: Color(0xFF00880C),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
 
                               const SizedBox(height: 20),
 
-                              // Promo Card
-                              _buildPromoCard(
-                                'images/promo1.png',
-                                'Gopay Pinjam',
-                                'Cicilan mulai dari 0.06%/hari! Segera aktifkan dan rasakan kemudahannya',
+                              // Promo Cards with InkWell
+                              InkWell(
+                                onTap: () {},
+                                child: _buildPromoCard(
+                                  'images/promo1.png',
+                                  'Gopay Pinjam',
+                                  'Cicilan mulai dari 0.06%/hari! Segera aktifkan dan rasakan kemudahannya',
+                                ),
                               ),
 
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
 
-                              _buildPromoCard(
-                                'images/promo2.jpg',
-                                'Cobain Kirim Barang Besar, Diskon s.d. Rp100.000! ✅',
-                                'Khusus Buat kamu, GoBox kasih kamu diskon s.d. Rp100.000 yang bisa kamu pakai untuk kirim barang besar, pindahan, beli peralatan furniture, hingga angkut motor untuk di service.',
+                              InkWell(
+                                onTap: () {},
+                                child: _buildPromoCard(
+                                  'images/promo2.jpg',
+                                  'Cobain Kirim Barang Besar, Diskon s.d. Rp100.000! ✅',
+                                  'Khusus Buat kamu, GoBox kasih kamu diskon s.d. Rp100.000 yang bisa kamu pakai untuk kirim barang besar, pindahan, beli peralatan furniture, hingga angkut motor untuk di service.',
+                                ),
                               ),
 
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
 
-                              _buildPromoCard(
-                                'images/promo3.jpg',
-                                'Bepergian ke Mana pun, Lebih Hemat Naik GoCar/GoRide 🚗',
-                                'Lagi mau bepergian? Mending pake GoCar/GoRide aja karena udah pasti aman dan nyaman. Selain itu bayarnya lebih hemat karena ada voucher diskon senilai total Rp50.000 pakai GoPay',
+                              InkWell(
+                                onTap: () {},
+                                child: _buildPromoCard(
+                                  'images/promo3.jpg',
+                                  'Bepergian ke Mana pun, Lebih Hemat Naik GoCar/GoRide 🚗',
+                                  'Lagi mau bepergian? Mending pake GoCar/GoRide aja karena udah pasti aman dan nyaman. Selain itu bayarnya lebih hemat karena ada voucher diskon senilai total Rp50.000 pakai GoPay',
+                                ),
                               ),
                             ],
                           ),
@@ -296,37 +385,36 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ],
             ),
+          ),
 
-            // Sticky Header
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                height: 90,
-                decoration: BoxDecoration(
-                  color: _isScrolled ? Colors.white : const Color(0xFF03AA15),
-                  boxShadow:
-                      _isScrolled
-                          ? [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ]
-                          : [],
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child: SafeArea(
-                  bottom: false,
-                  child: Row(
-                    children: [
-                      Expanded(
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: 90,
+              decoration: BoxDecoration(
+                color: _isScrolled ? Colors.white : const Color(0xFF03AA15),
+                boxShadow:
+                    _isScrolled
+                        ? [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                        : [],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: SafeArea(
+                bottom: false,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {},
                         child: Stack(
                           alignment: Alignment.centerLeft,
                           children: [
@@ -338,7 +426,7 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 12),
+                              padding: const EdgeInsets.only(left: 12),
                               child: Icon(
                                 Icons.search,
                                 size: 30,
@@ -358,8 +446,14 @@ class _DashboardState extends State<Dashboard> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Container(
+                    ),
+                    const SizedBox(width: 10),
+                    InkWell(
+                      onTap: () {
+                        print("Profile icon tapped");
+                        Navigator.pushNamed(context, '/profile');
+                      },
+                      child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.grey, width: 0.5),
@@ -370,43 +464,37 @@ class _DashboardState extends State<Dashboard> {
                           child: Icon(Icons.person, color: Color(0xFF00880C)),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.grey.shade200)),
         ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: Colors.grey.shade200)),
-          ),
-          child: Container(
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildNavItem('images/bottombar/home.png', 'Home', 0),
-                ),
-                Expanded(
-                  child: _buildNavItem(
-                    'images/bottombar/promos.png',
-                    'Promo',
-                    1,
-                  ),
-                ),
-                Expanded(
-                  child: _buildNavItem(
-                    'images/bottombar/orders.png',
-                    'Aktivitas',
-                    2,
-                  ),
-                ),
-                Expanded(
-                  child: _buildNavItem('images/bottombar/chat.png', 'Chat', 3),
-                ),
-              ],
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildNavItem('images/bottombar/home.png', 'Home', 0),
             ),
-          ),
+            Expanded(
+              child: _buildNavItem('images/bottombar/promos.png', 'Promo', 1),
+            ),
+            Expanded(
+              child: _buildNavItem(
+                'images/bottombar/orders.png',
+                'Aktivitas',
+                2,
+              ),
+            ),
+            Expanded(
+              child: _buildNavItem('images/bottombar/chat.png', 'Chat', 3),
+            ),
+          ],
         ),
       ),
     );
@@ -428,116 +516,182 @@ class _DashboardState extends State<Dashboard> {
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Row(
           children: [
-            Container(
-              height: 30,
-              width: 30,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                shape: BoxShape.circle,
-              ),
-              child: Image.asset('images/wallet.png', fit: BoxFit.contain),
-            ),
-            const SizedBox(width: 15),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Rp150.703',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 14,
+            GestureDetector(
+              // Bungkus dengan GestureDetector dari sini
+              onTap: () {
+                print("Wallet area tapped");
+                Navigator.pushNamed(context, '/riwayat');
+              },
+              child: Row(
+                // Tambahkan Row untuk mengelompokkan wallet icon dan text
+                children: [
+                  Container(
+                    height: 30,
+                    width: 30,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.asset(
+                      'images/wallet.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                ),
-                Text(
-                  '0 Coins',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
+                  const SizedBox(width: 15),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Rp150.703',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        '0 Coins',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const Spacer(),
-            Column(
-              children: [
-                Container(
-                  height: 23,
-                  width: 23,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF09B0D6),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Color(0xFF09B0D6), width: 0.5),
+            GestureDetector(
+              onTap: () {
+                print("Pay button tapped");
+                Navigator.pushNamed(context, '/qris');
+              },
+              child: Column(
+                children: [
+                  Container(
+                    height: 23,
+                    width: 23,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF09B0D6),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: const Color(0xFF09B0D6),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_upward_rounded,
+                      color: Colors.white,
+                      weight: 1000,
+                      size: 20,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.arrow_upward_rounded,
-                    color: Colors.white,
-                    weight: 1000,
-                    size: 20,
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Bayar',
+                    style: TextStyle(color: Colors.black, fontSize: 12),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Bayar',
-                  style: TextStyle(color: Colors.black, fontSize: 12),
-                ),
-              ],
+                ],
+              ),
             ),
-
-            SizedBox(width: 20),
-
-            Column(
-              children: [
-                Container(
-                  height: 23,
-                  width: 23,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF09B0D6),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Color(0xFF09B0D6), width: 0.5),
+            const SizedBox(width: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/topup');
+              },
+              child: Column(
+                children: [
+                  Container(
+                    height: 23,
+                    width: 23,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF09B0D6),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: const Color(0xFF09B0D6),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.add_rounded,
-                    color: Colors.white,
-                    weight: 2000,
-                    size: 20,
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Top Up',
+                    style: TextStyle(color: Colors.black, fontSize: 12),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Top Up',
-                  style: TextStyle(color: Colors.black, fontSize: 12),
-                ),
-              ],
+                ],
+              ),
             ),
-
-            SizedBox(width: 20),
-
-            Column(
-              children: [
-                Container(
-                  height: 23,
-                  width: 23,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF09B0D6),
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: Color(0xFF09B0D6), width: 0.5),
+            const SizedBox(width: 20),
+            GestureDetector(
+              onTap: () {
+                print("Lainnya button tapped");
+                Navigator.pushNamed(context, '/home');
+              },
+              child: Column(
+                children: [
+                  Container(
+                    height: 23,
+                    width: 23,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF09B0D6),
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(
+                        color: const Color(0xFF09B0D6),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.more_horiz_rounded,
+                      color: Colors.white,
+                      weight: 2000,
+                      size: 20,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.more_horiz_rounded,
-                    color: Colors.white,
-                    weight: 2000,
-                    size: 20,
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Lainnya',
+                    style: TextStyle(color: Colors.black, fontSize: 12),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Lainnya',
-                  style: TextStyle(color: Colors.black, fontSize: 12),
-                ),
-              ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(String icon, String label, int index) {
+    bool isSelected = index == 0;
+    return InkWell(
+      onTap: () {},
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: double.infinity,
+              height: 4,
+              color: isSelected ? const Color(0xFF00880C) : Colors.transparent,
+            ),
+            const SizedBox(height: 8),
+            Image.asset(icon, width: 20, height: 20),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isSelected ? const Color(0xFF00880C) : Colors.grey,
+              ),
             ),
           ],
         ),
@@ -565,8 +719,7 @@ Widget _buildPromoCard(String images, String title, String subtitle) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Gambar tanpa padding apapun
-        Container(
+        SizedBox(
           width: double.infinity,
           child: Image.asset(images, fit: BoxFit.fitWidth),
         ),
@@ -577,7 +730,7 @@ Widget _buildPromoCard(String images, String title, String subtitle) {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -592,36 +745,6 @@ Widget _buildPromoCard(String images, String title, String subtitle) {
           ),
         ),
       ],
-    ),
-  );
-}
-
-Widget _buildNavItem(String icon, String label, int index) {
-  bool isSelected = index == 0;
-  return InkWell(
-    onTap: () {},
-    child: Padding(
-      padding: EdgeInsets.only(bottom: 5),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: double.infinity,
-            height: 4,
-            color: isSelected ? const Color(0xFF00880C) : Colors.transparent,
-          ),
-          SizedBox(height: 8),
-          Image.asset(icon, width: 20, height: 20),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: isSelected ? const Color(0xFF00880C) : Colors.grey,
-            ),
-          ),
-        ],
-      ),
     ),
   );
 }

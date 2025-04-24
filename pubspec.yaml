@@ -35,6 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   font_awesome_flutter: ^10.8.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
+  camera: ^0.11.1
+  permission_handler: ^12.0.0+1
 
 dev_dependencies:
   flutter_test:
@@ -71,11 +75,16 @@ flutter:
     - images/promo2.jpg
     - images/promo3.jpg
     - images/jumbotron.png
-
+    - images/jumbotron2.png
+    - images/jumbotron3.jpg
+    - images/jumbotron4.jpg
+    - images/launcher/gojek.png
     - images/bottombar/home.png
     - images/bottombar/chat.png
     - images/bottombar/promos.png
     - images/bottombar/orders.png
+    - images/foto1.png
+    - images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -102,3 +111,15 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "images/launcher/gojek.png"
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: images/launcher/gojek.png
+  android: true
+  ios: true
+  fullscreen: true
