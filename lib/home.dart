@@ -9,7 +9,6 @@ class Home extends StatefulWidget {
 class _GoPayHomePageState extends State<Home> {
   bool showMore = false;
   bool isMinimized = false;
-  int _currentIndex = 0;
 
   final List<Map<String, String>> brandItems = [
     {"image": "images/alfamart.jpg", "title": "Alfamart", "tag": "38% off"},
@@ -159,24 +158,17 @@ class _GoPayHomePageState extends State<Home> {
         SizedBox(height: 10),
         SizedBox(
           height: 140,
-          child: Padding(
-            padding: EdgeInsets.only(left: 16),
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: brandItems.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              itemBuilder: (context, index) {
-                final item = brandItems[index];
-                return Container(
-                  margin: EdgeInsets.only(right: 8),
-                  child: _brandCard(item),
-                );
-              },
-            ),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            itemCount: brandItems.length,
+            itemBuilder: (context, index) {
+              final item = brandItems[index];
+              return Container(
+                margin: EdgeInsets.only(right: 12),
+                child: _brandCard(item),
+              );
+            },
           ),
         ),
       ],
@@ -185,7 +177,7 @@ class _GoPayHomePageState extends State<Home> {
 
   Widget _brandCard(Map<String, String> item) {
     return Container(
-      width: 140,
+      width: 120, // Fixed width for each card
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -193,7 +185,8 @@ class _GoPayHomePageState extends State<Home> {
       ),
       padding: EdgeInsets.all(8),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (item["tag"] != null)
             Container(
@@ -213,6 +206,7 @@ class _GoPayHomePageState extends State<Home> {
           Text(
             item["title"]!,
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -282,7 +276,6 @@ class _GoPayHomePageState extends State<Home> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Membuat 'Your balance' diklik untuk redirect ke halaman riwayat
                 GestureDetector(
                   onTap: () {
                     Navigator.pushNamed(context, '/riwayat');

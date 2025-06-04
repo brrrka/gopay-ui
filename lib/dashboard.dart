@@ -13,11 +13,15 @@ class ServiceModel {
   final String name;
   final Color color;
   final String iconPath;
+  final String? bannerText; // Optional banner text
+  final Color? bannerColor; // Optional banner color
 
   ServiceModel({
     required this.name,
     required this.color,
     required this.iconPath,
+    this.bannerText,
+    this.bannerColor,
   });
 }
 
@@ -48,26 +52,35 @@ class _DashboardState extends State<Dashboard> {
       name: 'GoRide',
       color: const Color(0xFF00AA13),
       iconPath: 'images/goride.png',
+      bannerText: '5RB!', // Add banner text
+      bannerColor: Colors.black, // Banner color
     ),
     ServiceModel(
       name: 'GoCar',
       color: const Color(0xFF00AA13),
       iconPath: 'images/gocar.png',
+      bannerText: '6RB!',
+      bannerColor: Colors.black,
     ),
     ServiceModel(
       name: 'GoFood',
       color: const Color(0xFFEE2737),
       iconPath: 'images/gofood.png',
+      bannerText: '-75%',
+      bannerColor: Colors.black,
     ),
     ServiceModel(
       name: 'GoSend',
       color: const Color(0xFF00AA13),
       iconPath: 'images/gosend.png',
+      bannerText: '5RB!',
+      bannerColor: Colors.black,
     ),
     ServiceModel(
       name: 'GoMart',
       color: const Color(0xFFED2739),
       iconPath: 'images/gomart.png',
+      // No banner for this service
     ),
     ServiceModel(
       name: 'GoTagihan',
@@ -239,7 +252,6 @@ class _DashboardState extends State<Dashboard> {
                                     return InkWell(
                                       onTap: () {
                                         print("Mengklik ${service.name}");
-                                        // Add your service tap handling here
                                       },
                                       child: SizedBox(
                                         width: 80,
@@ -479,7 +491,11 @@ class _DashboardState extends State<Dashboard> {
         child: Row(
           children: [
             Expanded(
-              child: _buildNavItem('images/bottombar/home.png', 'Home', 0),
+              child: _buildNavItem(
+                'images/bottombar/home-active.png',
+                'Home',
+                0,
+              ),
             ),
             Expanded(
               child: _buildNavItem('images/bottombar/promos.png', 'Promo', 1),
@@ -672,7 +688,17 @@ class _DashboardState extends State<Dashboard> {
   Widget _buildNavItem(String icon, String label, int index) {
     bool isSelected = index == 0;
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        if (index == 1) {
+          // Navigate to Promo page
+          Navigator.pushNamed(context, '/promo');
+        } else if (index == 2) {
+          // Navigate to Activities (implement later)
+        } else if (index == 3) {
+          // Navigate to Chat (implement later)
+        }
+        // index 0 is home (current page), no action needed
+      },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 5),
         child: Column(
@@ -758,17 +784,48 @@ class ServiceItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: service.color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Image.asset(service.iconPath, width: 30, height: 30)],
-          ),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: service.color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(service.iconPath, width: 30, height: 30),
+                ],
+              ),
+            ),
+            // Banner (jika ada)
+            if (service.bannerText != null)
+              Positioned(
+                top: -8,
+                left: -8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: service.bannerColor ?? Colors.black,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    service.bannerText!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 8),
         Text(

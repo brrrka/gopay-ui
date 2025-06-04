@@ -20,8 +20,6 @@ class Profile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildProfileHeader(),
-            const Divider(height: 1),
-
             Padding(
               padding: const EdgeInsets.only(
                 left: 16.0,
@@ -90,8 +88,8 @@ class Profile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 48, 
-            height: 48, 
+            width: 48,
+            height: 48,
             decoration: const BoxDecoration(
               color: Color(0xFF00880C),
               shape: BoxShape.circle,
@@ -101,7 +99,7 @@ class Profile extends StatelessWidget {
                 'B',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 22, 
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -150,15 +148,10 @@ class Profile extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListTile(
-              leading: Icon(
-                icon,
-                color: Colors.black87,
-              ), 
+              leading: Icon(icon, color: Colors.black87),
               title: Text(
                 title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle:
                   subtitle != null
@@ -171,10 +164,7 @@ class Profile extends StatelessWidget {
             ),
           ),
         ),
-        Divider(
-          height: 1,
-          color: Colors.grey[300],
-        ), 
+        Divider(height: 1, color: Colors.grey[300]),
       ],
     );
   }
@@ -187,13 +177,10 @@ class Profile extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListTile(
-              leading: const Icon(
-                Icons.security,
-                color: Colors.black87,
-              ), 
+              leading: const Icon(Icons.security, color: Colors.black87),
               title: const Text(
                 'Keamanan akun',
-                style: TextStyle(fontWeight: FontWeight.bold), 
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -232,13 +219,10 @@ class Profile extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListTile(
-              leading: const Icon(
-                Icons.star,
-                color: Colors.black87,
-              ), 
+              leading: const Icon(Icons.star, color: Colors.black87),
               title: const Text(
                 'Beri rating',
-                style: TextStyle(fontWeight: FontWeight.bold), 
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -254,7 +238,7 @@ class Profile extends StatelessWidget {
             ),
           ),
         ),
-        Divider(height: 1, color: Colors.grey[300]), 
+        Divider(height: 1, color: Colors.grey[300]),
       ],
     );
   }

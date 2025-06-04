@@ -7,7 +7,7 @@ class Riwayat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      elevation: 0,
+        elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         leading: IconButton(
@@ -214,9 +214,7 @@ void showDatePicker(BuildContext context) {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // Action for the 'Hapus' button can be added here
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -332,7 +330,7 @@ void showDatePicker(BuildContext context) {
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(vertical: 12.0),
                   padding: const EdgeInsets.symmetric(
-                    vertical: 12.0,
+                    vertical: 16.0,
                     horizontal: 16.0,
                   ),
                   decoration: BoxDecoration(
@@ -361,88 +359,119 @@ void showLayananPicker(BuildContext context) {
     isScrollControlled: true,
     backgroundColor: Colors.white,
     builder: (BuildContext context) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Filter tipe transaksi',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 5,
-                    ),
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: const Text(
-                    'Hapus',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                ),
-              ],
+      return DraggableScrollableSheet(
+        initialChildSize: 0.6, // Bisa disesuaikan (60% dari tinggi layar)
+        minChildSize: 0.3, // Minimum 30%
+        maxChildSize: 0.9, // Maximum 90%
+        expand: false,
+        builder: (context, scrollController) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16.0,
+              right: 16.0,
+              top: 16.0,
             ),
-            const SizedBox(height: 16),
-            GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 16,
-              itemBuilder: (context, index) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.blue,
-                      child: Icon(
-                        Icons.local_dining,
-                        color: Colors.white,
-                        size: 24,
+            child: SingleChildScrollView(
+              controller:
+                  scrollController, // Gunakan scroll controller yang disediakan
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Filter tipe transaksi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 5,
+                          ),
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          'Hapus',
+                          style: TextStyle(color: Colors.grey, fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Menggunakan SizedBox dengan tinggi terbatas untuk GridView
+                  SizedBox(
+                    height: 300, // Batasi tinggi GridView
+                    child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio:
+                                0.8, // Sesuaikan rasio tinggi-lebar item
+                          ),
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Gunakan ScrollPhysics dari parent
+                      shrinkWrap: true,
+                      itemCount: 16,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 25, // Kurangi sedikit ukuran avatar
+                              backgroundColor: Colors.blue,
+                              child: Icon(
+                                Icons.local_dining,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Icon $index',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12.0,
+                      horizontal: 16.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Pasang filter',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text('Icon $index', style: const TextStyle(fontSize: 12)),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(vertical: 12.0),
-              padding: const EdgeInsets.symmetric(
-                vertical: 12.0,
-                horizontal: 16.0,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Center(
-                child: Text(
-                  'Pasang filter',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       );
     },
   );
@@ -665,7 +694,7 @@ class BannerPromosi extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Image.asset('images/foto1.png', width: 100, fit: BoxFit.contain),
+        Image.asset('images/foto1.png', width: 80, fit: BoxFit.contain),
         Spacer(),
 
         Container(
@@ -674,8 +703,8 @@ class BannerPromosi extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.only(
-            left: 30,
-            right: 16,
+            left: 12,
+            right: 12,
             top: 12,
             bottom: 12,
           ),

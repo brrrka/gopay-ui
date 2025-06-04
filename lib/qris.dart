@@ -45,7 +45,6 @@ class _QRISPageState extends State<Qris> {
         _isCameraInitialized = true;
         setState(() {});
       } catch (e) {
-        print('Error starting camera: $e');
         setState(() {
           _isCameraActive = false;
         });
@@ -199,8 +198,7 @@ class _QRISPageState extends State<Qris> {
                         color: Colors.black,
                         size: 20,
                       ),
-                      onPressed: () {
-                      },
+                      onPressed: () {},
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -224,8 +222,7 @@ class _QRISPageState extends State<Qris> {
                         color: Colors.black,
                         size: 20,
                       ),
-                      onPressed: () {
-                      },
+                      onPressed: () {},
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -249,8 +246,7 @@ class _QRISPageState extends State<Qris> {
                         color: Colors.black,
                         size: 20,
                       ),
-                      onPressed: () {
-                      },
+                      onPressed: () {},
                     ),
                   ),
                 ],

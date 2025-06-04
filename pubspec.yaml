@@ -63,28 +63,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/wallet.png
-    - images/goride.png
-    - images/gocar.png
-    - images/gomart.png
-    - images/gofood.png
-    - images/gosend.png
-    - images/gotagihan.png
-    - images/gotix.png
-    - images/promo1.png
-    - images/promo2.jpg
-    - images/promo3.jpg
-    - images/jumbotron.png
-    - images/jumbotron2.png
-    - images/jumbotron3.jpg
-    - images/jumbotron4.jpg
-    - images/launcher/gojek.png
-    - images/bottombar/home.png
-    - images/bottombar/chat.png
-    - images/bottombar/promos.png
-    - images/bottombar/orders.png
-    - images/foto1.png
     - images/
+    - images/bottombar/
+    - images/bottombar/chat.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
