@@ -462,7 +462,6 @@ class _DashboardState extends State<Dashboard> {
                     const SizedBox(width: 10),
                     InkWell(
                       onTap: () {
-                        print("Profile icon tapped");
                         Navigator.pushNamed(context, '/profile');
                       },
                       child: Container(
@@ -538,7 +537,6 @@ class _DashboardState extends State<Dashboard> {
             GestureDetector(
               // Bungkus dengan GestureDetector dari sini
               onTap: () {
-                print("Wallet area tapped");
                 Navigator.pushNamed(context, '/riwayat');
               },
               child: Row(
@@ -582,7 +580,6 @@ class _DashboardState extends State<Dashboard> {
             const Spacer(),
             GestureDetector(
               onTap: () {
-                print("Pay button tapped");
                 Navigator.pushNamed(context, '/qris');
               },
               child: Column(
@@ -695,9 +692,8 @@ class _DashboardState extends State<Dashboard> {
         } else if (index == 2) {
           // Navigate to Activities (implement later)
         } else if (index == 3) {
-          // Navigate to Chat (implement later)
+          Navigator.pushNamed(context, '/pesan');
         }
-        // index 0 is home (current page), no action needed
       },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 5),

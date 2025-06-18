@@ -1826,13 +1826,15 @@ class _PromoState extends State<Promo> {
     return InkWell(
       onTap: () {
         if (index == 0) {
+          // Navigate to Home (Dashboard)
           Navigator.pushReplacementNamed(context, '/');
         } else if (index == 1) {
-          // Already on promo page
+          // Already on Promo page - do nothing
         } else if (index == 2) {
-          // Navigate to activities
+          // Navigate to Activities (implement later)
         } else if (index == 3) {
-          // Navigate to chat
+          // Navigate to Chat
+          Navigator.pushNamed(context, '/pesan');
         }
       },
       child: Padding(
