@@ -833,7 +833,7 @@ class _PromoState extends State<Promo> {
                   const SizedBox(height: 20),
 
                   _buildServiceHeaderSmall(
-                    'images/gopay.jpg',
+                    'images/gopaywhite.png',
                     const Color(0xFF005BAE),
                     'GoPay',
                   ),
@@ -936,7 +936,7 @@ class _PromoState extends State<Promo> {
                   const SizedBox(height: 20),
 
                   _buildServiceHeaderSmall(
-                    'images/gopay.jpg',
+                    'images/gopaywhite.png',
                     const Color(0xFF005BAE),
                     'GoPay',
                   ),
@@ -1600,13 +1600,33 @@ class _PromoState extends State<Promo> {
             borderRadius: BorderRadius.circular(100),
           ),
           child: Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: Colors.white,
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                iconPath,
+                width: 12,
+                height: 12,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback icon berdasarkan service name
+                  IconData fallbackIcon;
+                  switch (serviceName.toLowerCase()) {
+                    case 'gofood':
+                      fallbackIcon = Icons.restaurant;
+                      break;
+                    case 'gomart':
+                      fallbackIcon = Icons.shopping_cart;
+                      break;
+                    case 'gopay':
+                      fallbackIcon = Icons.account_balance_wallet;
+                      break;
+                    default:
+                      fallbackIcon = Icons.fastfood;
+                  }
+                  return Icon(fallbackIcon, size: 12, color: Colors.grey);
+                },
+              ),
             ),
-            child: const Icon(Icons.fastfood, size: 12, color: Colors.grey),
           ),
         ),
         const SizedBox(width: 12),
@@ -1631,18 +1651,6 @@ class _PromoState extends State<Promo> {
   ) {
     return Container(
       width: 150,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1735,7 +1743,7 @@ class _PromoState extends State<Promo> {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 4, 0),
             child: _buildServiceHeaderSmall(
-              'images/gopay.jpg',
+              'images/gopaywhite.png',
               const Color(0xFF005BAE),
               'GoPay',
             ),
