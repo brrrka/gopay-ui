@@ -690,7 +690,8 @@ class _DashboardState extends State<Dashboard> {
           // Navigate to Promo page
           Navigator.pushNamed(context, '/promo');
         } else if (index == 2) {
-          // Navigate to Activities (implement later)
+          // Navigate to Activities - PERBAIKAN DI SINI
+          Navigator.pushNamed(context, '/aktivitas');
         } else if (index == 3) {
           Navigator.pushNamed(context, '/pesan');
         }

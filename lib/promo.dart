@@ -1651,6 +1651,18 @@ class _PromoState extends State<Promo> {
   ) {
     return Container(
       width: 150,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            spreadRadius: 2,
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1839,7 +1851,8 @@ class _PromoState extends State<Promo> {
         } else if (index == 1) {
           // Already on Promo page - do nothing
         } else if (index == 2) {
-          // Navigate to Activities (implement later)
+          // Navigate to Activities - PERBAIKAN DI SINI
+          Navigator.pushNamed(context, '/aktivitas');
         } else if (index == 3) {
           // Navigate to Chat
           Navigator.pushNamed(context, '/pesan');

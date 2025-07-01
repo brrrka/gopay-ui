@@ -434,7 +434,8 @@ class ChatListPage extends StatelessWidget {
         } else if (index == 1) {
           Navigator.pushNamed(context, '/promo');
         } else if (index == 2) {
-          // Navigate to Activities (implement later)
+          // Navigate to Activities - PERBAIKAN DI SINI
+          Navigator.pushNamed(context, '/aktivitas');
         } else if (index == 3) {
           // Already on chat page
         }

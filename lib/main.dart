@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gopay_ui/aktivitas.dart';
 import 'package:gopay_ui/dashboard.dart';
 import 'package:gopay_ui/home.dart';
 import 'package:gopay_ui/profile.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/riwayat': (context) => const Riwayat(),
         '/pesan': (context) => const Pesan(),
         '/bantuan': (context) => const Bantuan(),
+        '/aktivitas': (context) => const Aktivitas(),
       },
     );
   }
